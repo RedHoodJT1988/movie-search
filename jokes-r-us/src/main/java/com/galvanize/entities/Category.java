@@ -5,5 +5,6 @@ public enum Category {
     DADJOKES,
     MOMJOKES,
     KIDJOKES,
-    KNOCKKNOCK
+    KNOCKKNOCK,
+    NA
 }

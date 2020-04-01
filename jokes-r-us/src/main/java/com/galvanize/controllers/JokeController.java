@@ -1,7 +1,8 @@
 package com.galvanize.controllers;
-import com.galvanize.exception.RecordNotFoundException;
-import com.galvanize.jokes.entities.Category;
-import com.galvanize.jokes.entities.Joke;
+
+import com.galvanize.exceptions.RecordNotFoundException;
+import com.galvanize.entities.Category;
+import com.galvanize.entities.Joke;
 import com.galvanize.services.JokeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

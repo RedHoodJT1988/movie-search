@@ -1,7 +1,8 @@
 package com.galvanize.controllers;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.galvanize.jokes.entities.Category;
-import com.galvanize.jokes.entities.Joke;
+import com.galvanize.entities.Category;
+import com.galvanize.entities.Joke;
 import com.galvanize.repositories.JokeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,17 +42,17 @@ class JokeControllerTest {
         //Generate Test Data
         for (int i = 1; i <=10; i++) {
             if(i %2 == 0){
-                testJokes.add(new Joke((long) (i * 1000), Category.DADJOKES, "This is a dad joke number "+i));
+                testJokes.add(new Joke((long) (i * 1000), Category.DADJOKES, "How do you make holy water? You boil the hell out of it."+i));
             }else{
-                testJokes.add(new Joke((long) (i * 2000), Category.TECHNOLOGY, "This is a technology joke number "+i));
+                testJokes.add(new Joke((long) (i * 2000), Category.TECHNOLOGY, "There's no place like 127.0.0.1"+i));
             }
         }
     }
     //    POST: new joke - accept any joke in one of the specified categories
     @Test
     void createNewJoke() throws Exception {
-        Joke newJoke = new Joke(Category.MOMJOKES, "This is a great MOM joke!");
-        newJoke.setJokeId(9999L);
+        Joke newJoke = new Joke(Category.MOMJOKES, "I bought some shoes from a drug dealer. I don't know what he laced them with, but I was tripping all day!");
+        newJoke.setId(1L);
         String jokeJson = mapper.writeValueAsString(newJoke);
         when(jokeRepository.save(ArgumentMatchers.any(Joke.class))).thenReturn(newJoke);
         mvc.perform(post("/api/jokes").contentType(MediaType.APPLICATION_JSON).content(jokeJson))
@@ -88,12 +89,9 @@ class JokeControllerTest {
     //    GET: Random Joke by Optional Category
     @Test
     void getRandomJoke_withCategory() throws Exception {
-        when(jokeRepository.findRandomJoke(Category.TECHNOLOGY)).thenReturn(testJokes.get(2));
         when(jokeRepository.findRandomJokeByCategory(testJokes.get(2).getCategory().toString())).thenReturn(testJokes.get(2));
-        mvc.perform(get("/api/jokes/random").param("category", Category.TECHNOLOGY.toString()))
         mvc.perform(get("/api/jokes/random").param("category", testJokes.get(2).getCategory().toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.category", is(Category.TECHNOLOGY.toString())));
                 .andExpect(jsonPath("$.category", is(testJokes.get(2).getCategory().toString())));
     }
     //    PATCH: Update any of the fields for a Joke

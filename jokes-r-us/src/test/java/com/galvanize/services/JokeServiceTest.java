@@ -25,7 +25,7 @@ public class JokeServiceTest {
         jokeRepository.save(joke);
         JokeService jokeService = new JokeService(jokeRepository);
 
-        Joke firstResult = jokeService.findAll().get(0);
+        Joke firstResult = jokeService.getAllJokes().get(0);
 
         assertEquals(joke.getJoke(), firstResult.getJoke());
         assertEquals(joke.getCategory(), firstResult.getCategory());
