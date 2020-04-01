@@ -1,22 +1,59 @@
 package com.galvanize.controllers;
-
-import com.galvanize.entities.Joke;
+import com.galvanize.exception.RecordNotFoundException;
+import com.galvanize.jokes.entities.Category;
+import com.galvanize.jokes.entities.Joke;
 import com.galvanize.services.JokeService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
 @RestController
+@RequestMapping("/api/jokes")
 public class JokeController {
-    @Autowired
-    private JokeService jokeService;
-
-    @GetMapping("/jokes")
-    ResponseEntity<List<Joke>> getAllJokes() {
-        return new ResponseEntity<>(jokeService.findAll(), HttpStatus.OK);
+    JokeService jokeService;
+    public JokeController(JokeService jokeService) {
+        this.jokeService = jokeService;
     }
-}
+    @PostMapping
+    public Joke createJoke(@RequestBody Joke joke){
+        return jokeService.addJoke(joke);
+    }
+    @GetMapping
+    public List<Joke> getAllJokes(){
+        return jokeService.getAllJokes();
+    }
+    @GetMapping("/search")
+    public List<Joke> getJokesContaining(@RequestParam String searchString){
+        return jokeService.findJokeContaining(searchString);
+    }
+    @GetMapping("/category/{category}")
+    public List<Joke> getJokesByCategory(@PathVariable Category category){
+        return jokeService.findJokesByCategory(category);
+    }
+    @GetMapping("/random")
+    public Joke getRandomJoke(@RequestParam(required = false) Category category){
+        return jokeService.getRandomJoke(category);
+        public ResponseEntity<Joke> getRandomJoke(@RequestParam(required = false, defaultValue = "%") String category){
+            Joke randomJoke;
+            if(category.equals("%")){
+                randomJoke = jokeService.getRandomeJokeByCategory(Category.NA);
+                return ResponseEntity.ok(randomJoke);
+            }else{
+                Category cat = Category.valueOf(category);
+                if (cat != null) {
+                    randomJoke = jokeService.getRandomeJokeByCategory(Category.valueOf(category));
+                    return ResponseEntity.ok(randomJoke);
+                }else{
+                    return ResponseEntity.notFound().header("errorMsg", "Category "+category+" is not valid").build();
+                }
+            }
+        }
+        @DeleteMapping("/{id}")
+        public ResponseEntity<String> deleteJokeById(@PathVariable Long id){
+            try{
+                jokeService.deleteById(id);
+                return ResponseEntity.ok("Deleted joke number "+id);
+            }catch (RecordNotFoundException e){
+                return ResponseEntity.noContent().header("errorMsg", e.getMessage()).build();
+            }
+        }
+    }
