@@ -35,7 +35,7 @@ public class MovieControllerTest {
     ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    void createMovie() throws Exception {
+    void createMovieReturnsMovie() throws Exception {
         // Setup
         Movie expectedMovie = new Movie("2", "Mickey Mouse", "2015", "2015", LocalDate.now());
         String movieJson = mapper.writeValueAsString(expectedMovie);
@@ -44,5 +44,12 @@ public class MovieControllerTest {
         mockMvc.perform(post("/api/movies").contentType(MediaType.APPLICATION_JSON).content(movieJson))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.movieId").exists());
+    }
+
+    @Test
+    void createMovieWhenNoDescriptionExists() throws Exception {
+        // Setup
+        Movie noDescriptionMovie = new Movie();
+        noDescriptionMovie.setMovieId();
     }
 }
